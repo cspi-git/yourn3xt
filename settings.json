@@ -1,0 +1,17 @@
+{
+    "cli": {
+        "navigationStyle": "[>]"
+    },
+    "log": {
+        "style": {
+            "left": "❮",
+            "right": "❯"
+        },
+        "prefixes": {
+            "information": "INFO",
+            "warning": "WARN",
+            "error": "ERR",
+            "critical": "CRITICAL"
+        }
+    }
+}
