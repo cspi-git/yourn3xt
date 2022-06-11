@@ -2,6 +2,7 @@
     "use strict";
 
     // Dependencies
+    const log = require('simple-node-logger').createSimpleLogger("./logs/errors.log")
     const YourN3xtModule = require("./modules/yourn3xt")
     const rra = require("recursive-readdir-async")
     const parallelPark = require("parallel-park")
@@ -42,6 +43,9 @@
                 both: "x86-x64"
             }
         },
+        status: {
+            errors: 0
+        },
         version: "1.0.0-beta"
     }
 
@@ -68,7 +72,7 @@
     }
 
     YourN3xt.banner = function(){
-        YourN3xtModule.randomBanner(chalk, { version: YourN3xt.version, counts: YourN3xt.plugins.counts })
+        YourN3xtModule.randomBanner(chalk, { version: YourN3xt.version, status: YourN3xt.status, counts: YourN3xt.plugins.counts })
 
         YourN3xt.checkVersion()
     }
@@ -230,7 +234,8 @@ Full Path: ${pluginInfo.fullPath}
             console.log()
         }else if(commandArgs[0] === "set" && plugin){
             var args = commandArgs.slice(1).join(" ")
-            args = minimist(shellQuote.parse(args))
+
+            args = minimist(shellQuote.parse(args), { string: ["name", "value"] })
 
             const name = args.name
             const value = args.value
@@ -273,6 +278,10 @@ Full Path: ${pluginInfo.fullPath}
             }
 
             return YourN3xt.callbackFaline(plugin, callback)
+        }else if(command === "errors"){
+            console.log()
+            console.log(fs.readFileSync("./logs/errors.log", "utf8"))
+            console.log()
         }else if(command === "plugins"){
             YourN3xt.showLoadedPlugins()
         }else if(command === "version"){
@@ -312,26 +321,35 @@ Full Path: ${pluginInfo.fullPath}
             const path = loadedPlugin.fullname
 
             plugin = new plugin(YourN3xt.log, global.plugin.info, global.plugin.dependencies, global.plugin.portables).info()
-            plugin.path = path.slice(path.indexOf("YourN3xt/plugins")+17, path.length).replace(".js", "")
-            plugin.fullPath = loadedPlugin.fullname
 
-            const rootDir = plugin.path.match(/^.*?\//g)[0].replace(/\//g, "")
-
-            if(YourN3xt.plugins.counts.hasOwnProperty(rootDir)) YourN3xt.plugins.counts[rootDir]++
-
-            if(plugin.hasOwnProperty("portable")){
-                const portable = plugin.portable
-
-                var portablePlugin = require(loadedPlugin.fullname)
-                portablePlugin = new portablePlugin(YourN3xt.log, global.plugin.info, global.plugin.dependencies, global.plugin.portables)
-
-                if(!global.plugin.portables.hasOwnProperty(portable.type)) global.plugin.portables[portable.type] = {}
-
-                global.plugin.portables[portable.type][portable.name] = portablePlugin
+            if(plugin.hasOwnProperty("name") && plugin.hasOwnProperty("description") && plugin.hasOwnProperty("options") && plugin.hasOwnProperty("disclosureDate")){
+                plugin.path = path.slice(path.indexOf("YourN3xt/plugins")+17, path.length).replace(".js", "")
+                plugin.fullPath = loadedPlugin.fullname
+    
+                const rootDir = plugin.path.match(/^.*?\//g)[0].replace(/\//g, "")
+    
+                if(YourN3xt.plugins.counts.hasOwnProperty(rootDir)) YourN3xt.plugins.counts[rootDir]++
+    
+                if(plugin.hasOwnProperty("portable")){
+                    const portable = plugin.portable
+    
+                    var portablePlugin = require(loadedPlugin.fullname)
+                    portablePlugin = new portablePlugin(YourN3xt.log, global.plugin.info, global.plugin.dependencies, global.plugin.portables)
+    
+                    if(!global.plugin.portables.hasOwnProperty(portable.type)) global.plugin.portables[portable.type] = {}
+    
+                    global.plugin.portables[portable.type][portable.name] = portablePlugin
+                }
+                
+                YourN3xt.plugins.loaded.push(plugin)
+            }else{
+                log.error(`Unable to load plugin. Plugin: ${loadedPlugin.fullname}`)
+                YourN3xt.status.errors++
             }
-            
-            YourN3xt.plugins.loaded.push(plugin)
-        }catch{}
+        }catch(err){
+            log.error(`Unable to load plugin. Plugin: ${loadedPlugin.fullname} | Error: ${err}`)
+            YourN3xt.status.errors++
+        }
     }
 
     if(!YourN3xt.plugins.plugins.length) return YourN3xt.log("c", "Something went wrong, no plugins found.")

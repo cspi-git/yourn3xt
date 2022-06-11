@@ -22,6 +22,8 @@ YourN3xt features & system quick dive.
 #### Commands
 - help
 - use
+- setVar(Future plan)
+- errors
 - plugin
 - version
 - exit
