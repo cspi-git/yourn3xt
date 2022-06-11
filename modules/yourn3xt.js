@@ -14,9 +14,15 @@ function status(chalk, info){
 
     console.log(`         ⥚- ${chalk.blueBright(`YourN3xt v${info.version}`)}`)
 
+    console.log()
+    console.log("         Plugins:")
     Object.keys(counts).forEach(name =>{
         console.log(`         ⥚- ${_.capitalize(name)} -> ${counts[name]}`)
     })
+
+    console.log()
+    console.log("         Status:")
+    console.log(`         ⥚- Errors encountered: ${info.status.errors ? info.status.errors : "None" }`)
 
     console.log()
     console.log(`   "${facts[Math.floor(Math.random() * facts.length)]}"`)
