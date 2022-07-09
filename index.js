@@ -2,7 +2,7 @@
     "use strict";
 
     // Dependencies
-    const log = require('simple-node-logger').createSimpleLogger("./logs/errors.log")
+    const log = require("simple-node-logger").createSimpleLogger("./logs/errors.log")
     const YourN3xtModule = require("./modules/yourn3xt")
     const rra = require("recursive-readdir-async")
     const parallelPark = require("parallel-park")
@@ -14,6 +14,7 @@
     const puppeteer = require("puppeteer")
     const minimist = require("minimist")
     const pwnedPW = require("pwned-pw")
+    const shellJS = require("shelljs")
     const sha256 = require("sha256")
     const chalk = require("chalk")
     const _ = require("lodash")
@@ -289,7 +290,9 @@ Full Path: ${pluginInfo.fullPath}
         }else if(command === "exit"){
             process.exit()
         }else{
-            YourN3xt.log("e", "Unrecognized command.")
+            const results = shellJS.exec(command, { silent: true })
+
+            results.stdout ? console.log(results.stdout) : YourN3xt.log("e", "Unrecognized command.")
         }
 
         YourN3xt.callbackFaline(plugin, callback)
