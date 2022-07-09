@@ -9,7 +9,7 @@ https://github.com/OTAKKATO/YourN3xt
 
 NpmJS:
 ```
-npm i recursive-readdir-async parallel-park python-shell readline-sync shell-quote request-async columnify puppeteer minimist pwned-pw sha256 chalk lodash fs
+npm i recursive-readdir-async parallel-park python-shell readline-sync shell-quote request-async columnify puppeteer minimist pwned-pw sha256 chalk lodash fs shelljs
 ```
 
 ## Usage
