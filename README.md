@@ -18,4 +18,4 @@ node index.js
 ```
 
 ## License
-MIT © OTAK
+MIT © Hanaui

@@ -78,7 +78,17 @@
         YourN3xt.checkVersion()
     }
 
-    YourN3xt.checkVersion = function(){
+    YourN3xt.checkVersion = async function(){
+        try{
+            var versions = await request("https://hanaui.vercel.app/api/github/repos/info")
+            versions = _.find(JSON.parse(versions.body), { name: "YourN3xt" }).versions
+            
+            for( const version of versions ) if(YourN3xt.version < version) YourN3xt.log("w", "New version detected. Please check https://github.com/hanaui-git/yourn3xt\n")
+        }catch{
+            YourN3xt.log("e", "Unable to check YourN3xt versions.")
+        }
+    
+
         YourN3xt.navigation()
     }
 
